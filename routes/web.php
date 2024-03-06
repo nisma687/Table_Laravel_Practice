@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -20,3 +21,8 @@ Route::get("packages/trashed",[PackageController::class,"valueTrash"]);
 Route::post("packages/store_update",[PackageController::class,"CreateOrUpdate"]);
 // Route::put("packages/store_update/{id}",[PackageController::class,"storeAndUpdate"]);
 Route::delete("packages/store_delete/{id}",[PackageController::class,"DeleteOrRestore"]);
+
+// student
+
+Route::post('/students', [StudentController::class, 'store']);
+Route::get('/students', [StudentController::class,'index']);
