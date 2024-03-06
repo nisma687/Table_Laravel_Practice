@@ -23,6 +23,7 @@ class PackageRequest extends FormRequest
     public function rules(): array
     {
         return [
+            "id"=>"sometimes",
             "package_name"=>"required|max:232|string",
             "package_price"=> "required|numeric",
             "currency"=> "required|string",

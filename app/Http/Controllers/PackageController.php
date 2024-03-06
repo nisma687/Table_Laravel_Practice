@@ -6,21 +6,22 @@ use App\Http\Requests\PackageRequest;
 use App\Http\Resources\PackageResource;
 use App\Models\Package;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PackageController extends Controller
 {
     public function index(){
-        $packages=Package::withTrashed()->get();
+        $packages = Package::withTrashed()->get();
 
         $packages = PackageResource::collection($packages);
 
-        if($packages){
+        if($packages) {
             return response()->json([
                 "status"=> "success",
                 "message"=> "you got the data",
                 "data"=> $packages
             ]);
-        }else{
+        } else {
             return response()->json([
                 "status"=> "success",
                 "message"=> "No data Found "
@@ -44,10 +45,13 @@ class PackageController extends Controller
         }
        
     }
+
     public function store(PackageRequest $request){
+
         $validatedData = $request->validated();
+
+
         $package = Package::create($validatedData);
-        
         
         return response()->json([
             "status"=> "success",
@@ -55,11 +59,77 @@ class PackageController extends Controller
             "data"=> $package
         ]);
     }
+  
+    public function storeAndUpdate(PackageRequest $request){
+        // return $request->all();
+        // dd($request->all());
+        $findData= Package::find($request->id);
+        if($findData){
+            $validateData=$request->validated();
+            $findData->update($validateData);
+            if($findData){
+                return response()->json([
+                    "status"=> "success",
+                    "message"=> "Package Updated successfully",
+                    "updated-data"=> "your data was updated",
+                ]);
+            }
+            else{
+                return response()->json([
+                    "status"=> "success",
+                    "message"=> "No updated data "
+                ]);
+
+            }
+
+
+        }
+        else{
+            $validateData=$request->validated();
+            $storePackage=Package::create($validateData);
+            if($storePackage){
+                return response()->json([
+                    "status"=> "success",
+                    "message"=> "stored data successfully"
+                ]);
+            }
+            else{
+                return response()->json([
+                    "status"=> "success",
+                    "message"=> "data not stored"
+                ]);
+
+            }
+
+
+        }
+    }
+    public function CreateOrUpdate(PackageRequest $request, Package $package){
+        $validateData=$request->validated();
+
+        Package::updateOrCreate($validateData);
+        if($package){
+            return response()->json([
+                
+                    "status"=> "success",
+                    "message"=> "stored data successfully"
+               
+            ]);
+        }
+        else{
+            return response()->json([
+                "status"=> "success",
+                "message"=> "data not stored"
+            ]);
+        }
+    }
     public function update(PackageRequest $request, $id){
         $package=Package::find($id);
+
         if($package){
-            $validateData=$request->validated();
+            $validateData = $request->validated();
             $package->update($validateData);
+
             return response()->json([
                 "status"=> "success",
                 "message"=> "Package Updated successfully",
@@ -73,6 +143,7 @@ class PackageController extends Controller
             ]);
         }
     }
+   
     public function show($id){
         $package=Package::find($id);
         if($package){
@@ -109,6 +180,7 @@ class PackageController extends Controller
     }
     public function restore($id){
         $packages=Package::withTrashed()->find($id);
+        
         if($packages){
             $packages->restore();
             return response()->json([
@@ -122,6 +194,24 @@ class PackageController extends Controller
                 "message"=> "sorry couldn't find any trashed data",
             ]);
         }
+    }
+    
+    public function DeleteOrRestore($id){
+        $packages=Package::withTrashed()->find($id);
+        $message = "";
+        if($packages->deleted_at != null){
+            $packages->restore();
+            $message = "restored";
+        }
+        else{
+            $packages->delete();
+            $message = "deleted";
+        }
+
+        return response()->json([
+            "status"=> "success",
+            "message"=> "successfully $message the data"
+        ]);
     }
     
 
