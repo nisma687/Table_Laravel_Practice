@@ -55,21 +55,13 @@ public function store(StudentRequest $request)
 
 public function index(){
     $student=Student::all();
-    if($student){
-        return response()->json([
-            "status"=> "success",
-            "message"=> "you got the data",
-            "data"=> $student
-        ]);
-    }else{
-        return response()->json([
-            "status"=> "success",
-            "message"=> "No data Found "
-        ]);
-    }
-
     
+    return view('homepage.home',compact('student'));
 }
+
+// public function create () {
+//     return view('homepage.create');
+// }
 
 
 
